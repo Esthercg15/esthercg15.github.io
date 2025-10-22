@@ -1,0 +1,107 @@
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9; /* Fondo suave */
+    color: #333;
+}
+
+main {
+    padding: 20px;
+    max-width: 900px;
+    margin: auto;
+}
+
+/* Cabecera */
+header {
+    background-color: #007bff; /* Color azul profesional (como Cisco) */
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+}
+
+header h2 {
+    margin: 5px 0 0;
+    font-weight: 300;
+}
+
+/* Secciones */
+section {
+    padding: 20px 0;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #ddd;
+}
+
+section h3 {
+    color: #007bff;
+    border-left: 5px solid #007bff;
+    padding-left: 10px;
+}
+
+/* Habilidades */
+#habilidades {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.habilidad-grupo {
+    flex: 1;
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.habilidad-grupo ul {
+    list-style: none;
+    padding: 0;
+}
+
+.habilidad-grupo li {
+    background: #e9ecef; /* Color de fondo para cada habilidad */
+    margin: 5px 0;
+    padding: 8px;
+    border-radius: 3px;
+}
+
+/* Botón y Proyectos */
+.btn {
+    display: inline-block;
+    background-color: #28a745; /* Color verde para el botón */
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+.proyecto-card {
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #007bff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.proyecto-card a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Pie de página */
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    font-size: 0.8em;
+}
