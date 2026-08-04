@@ -1,45 +1,58 @@
-# SQL Injection (Boolean-Based) & Source Code Analysis in DVWA
+# SQL Injection Analysis: From Exploitation to SOC Detection (DVWA)
 
-> **Disclaimer:** This project was conducted in a controlled lab environment for educational and defensive research purposes only. 
-
-## 1. Lab Environment & Initial Setup
-* **Target Machine:** Metasploitable (IP: 192.168.56.103)[cite: 1].
-* **Attacker Machine:** Kali Linux[cite: 1].
-* **Application:** DVWA (Damn Vulnerable Web App) accessed via the Kali Linux web browser[cite: 1].
-* **Authentication:** Logged into the application using default credentials (admin / password)[cite: 1].
+**Author:** [Tu Nombre]
+**Date:** [Fecha]
+**Objective:** To manually exploit a boolean-based SQL injection, analyze the underlying vulnerable PHP code, and document the detection artifacts left in the server logs from a Blue Team perspective.
 
 ---
 
-## 2. Phase 1: Exploitation (Low Security Level)
+## 1. Executive Summary
+This practice demonstrates the lifecycle of a SQL Injection attack in a controlled environment (Metasploitable 2 / DVWA). I started by exploiting a lack of input sanitization to bypass authentication logic. Following the exploitation, I conducted a white-box analysis of the source code to understand the root cause. Finally, I tested the application under a hardened security level to observe how mitigation techniques affect the attacker's visibility and what traces are left for a Security Operations Center (SOC) to detect.
 
-### 2.1. Enumeration
-* The DVWA security level was set to "low" to test the application in its most vulnerable state[cite: 1].
-* Initial tests were conducted by providing standard user IDs (e.g., 1, 2, 3)[cite: 1].
-* The web application returned standard error messages or user information, demonstrating how it behaves under normal conditions[cite: 1].
-
-### 2.2. Injection & Execution
-* The boolean payload `' OR '1'='1` was injected into the ID field[cite: 1].
-* The application concatenated this input without prior sanitization, resulting in an error[cite: 1].
-* This lack of input validation allowed the query to bypass intended logic and dump user information[cite: 1].
-
-### 2.3. Source Code Analysis (Whitebox)
-Reviewing the underlying PHP code reveals exactly why the vulnerability exists and how the payload manipulates the database[cite: 1]:
-* **The Escape ('):** Tricks the system by prematurely closing the text field, allowing everything written afterward to be interpreted as executable SQL commands rather than simple text[cite: 1].
-* **The Injection (UNION SELECT / OR):** Alters the original query, forcing the database to merge the expected result with confidential information extracted from other tables[cite: 1].
-* **The Patch (#):** Converts the remainder of the developer's original code into an ignored comment, preventing residual code from breaking the syntax and causing the attack to fail[cite: 1].
+## 2. Infrastructure Setup
+* **Attacker System:** Kali Linux
+* **Target System:** Metasploitable (IP: 192.168.56.103)
+* **Target Application:** Damn Vulnerable Web App (DVWA)
 
 ---
 
-## 3. Phase 2: Mitigation & SOC Detection (High Security Level)
+## 3. Phase 1: Vulnerability Exploitation (Low Security)
 
-To understand defensive mechanisms, the DVWA security mode was changed to "High" and the previous steps were repeated[cite: 1].
+### The Approach
+I configured the application to its lowest security setting to simulate a legacy or poorly configured web application. My initial enumeration consisted of testing valid user IDs (e.g., 1, 2) to observe the standard database response.
 
-### 3.1. Observations
-* The same boolean payload (`' OR '1'='1`) was submitted[cite: 1].
-* The application mitigated the attack silently[cite: 1].
-* No data was returned, and the application did not reveal the database structure through error messages[cite: 1].
-* The URL changed in the address bar, but this was due to the web browser encoding the URL, not because the server accepted the malicious attack[cite: 1].
+To test for SQL injection vulnerabilities, I injected a classic boolean payload: `' OR '1'='1`. 
 
-### 3.2. SOC Analyst Takeaways
-* **Log Traces:** Even though the server successfully blocked the attack and the web page displayed no errors, this specific request leaves a trace in the server logs[cite: 1]. 
-* **Detection Opportunities:** Blue teams can monitor these URL encoded payloads (`%3D`, `+OR+`) in HTTP access logs to detect and alert on active enumeration attempts against the infrastructure[cite: 1].
+### The Result
+The application successfully processed the payload and dumped the information of multiple users. Because the database interprets `'1'='1'` as universally true, the query bypassed the intended ID restriction and returned all rows.
+
+### Source Code Analysis (Root Cause)
+By reviewing the PHP backend, I identified the exact flaw:
+`$getid = "SELECT first_name, last_name FROM users WHERE user_id = '$id'";`
+
+The variable `$id` is passed directly into the SQL query without any sanitization (like `mysqli_real_escape_string`) or parameterization. 
+* The injected single quote (`'`) breaks out of the expected string.
+* The `OR` operator alters the logic.
+* The `#` symbol (if used) comments out the rest of the query, preventing syntax errors.
+
+---
+
+## 4. Phase 2: Mitigation and Detection (High Security)
+
+### The Approach
+To understand how security controls affect an attacker, I increased the DVWA security level to "High" and attempted the exact same boolean payload.
+
+### The Result
+The application mitigated the attack silently. No data was returned, and no SQL syntax errors were displayed on the screen. The application failed securely.
+
+### SOC & Blue Team Observations
+Although the attack failed on the front end, my analysis of the browser's behavior revealed critical information for defensive monitoring:
+
+1. **URL Encoding:** The browser automatically encoded the payload in the address bar (e.g., converting spaces to `+` and `=` to `%3D`). The resulting parameter was `?id='+OR+'1'%3D'1`.
+2. **Log Artifacts:** Even though the server dropped the malicious request, this encoded string is inevitably recorded in the web server's access logs (e.g., Apache `access.log`).
+3. **Detection Strategy:** As a SOC Analyst, I would implement SIEM detection rules targeting specific URL-encoded SQLi indicators (like `%27` for quotes, `%3D` for equals, and `UNION`) within HTTP GET requests. Even failed attempts serve as high-fidelity alerts of active reconnaissance or exploitation attempts against our infrastructure.
+
+---
+
+## 5. Analyst Notes & Lessons Learned
+*(Nota: Escribe aquí 2 o 3 líneas con tus propias palabras sobre lo que te ha parecido más interesante de la práctica. Por ejemplo: "This lab helped me bridge the gap between executing an attack and understanding how a SOC actually sees it in the logs...")*
