@@ -1,8 +1,10 @@
-# 💉 Writeup: SQL Injection & Source Code Analysis (DVWA)
+[ES Español](README_es.md)
+
+# Writeup: SQL Injection & Source Code Analysis (DVWA)
 
 > **Disclaimer:** All projects and writeups in this repository are conducted in controlled, isolated laboratory environments for educational purposes, defensive research, and incident response training. 
 
-## 🎯 MITRE ATT&CK Mapping
+## MITRE ATT&CK Mapping
 *   **Tactics:** Initial Access, Credential Access, Defense Evasion.
 *   **Techniques:**
     *   [T1190] Exploit Public-Facing Application
@@ -11,62 +13,63 @@
 
 ---
 
-## 1. Entorno y Preparación (Environment Setup)
+## 1. Environment Setup
 
-El ejercicio comienza comprobando la configuración de red de la máquina víctima (Metasploitable) para obtener su dirección IP[cite: 2].
+The exercise begins by checking the network configuration of the victim machine (Metasploitable) to obtain its IP address.
 
-![SOC Analyst - Comprobación IP](SOC_Analyst_01_ifconfig.png)
+![SOC Analyst - IP Check](SOC_Analyst_01_ifconfig.png)
 
-Una vez confirmada la IP (`192.168.56.103`), se verifica el acceso al servidor web desde el navegador de la máquina atacante (Kali Linux)[cite: 2].
+Once the IP (`192.168.56.103`) is confirmed, web server access is verified from the attacker machine's browser (Kali Linux).
 
-![SOC Analyst - Acceso Navegador](SOC_Analyst_02_acceso_navegador.png)
+![SOC Analyst - Browser Access](SOC_Analyst_02_acceso_navegador.png)
 
-Se accede al portal de Damn Vulnerable Web App (DVWA) introduciendo las credenciales por defecto: `admin` y `password`[cite: 2].
+The Damn Vulnerable Web App (DVWA) portal is accessed by entering the default credentials: `admin` and `password`.
 
-![SOC Analyst - Login DVWA](SOC_Analyst_03_login_dvwa.png)
-
----
-
-## 2. Enumeración y Explotación (Low Security)
-
-Para analizar la vulnerabilidad en su estado más crítico, se navega al menú "DVWA Security" y se configura el nivel de seguridad al nivel más bajo posible ("Low")[cite: 2].
-
-![SOC Analyst - Menú Seguridad](SOC_Analyst_04_menu_seguridad.png)
-![SOC Analyst - Nivel Low](SOC_Analyst_05_nivel_low.png)
-
-### 2.1. Comportamiento Base
-El primer paso de la enumeración consiste en comprobar cómo se comporta el aplicativo al introducir IDs de usuarios válidos (como 1, 2, 3...)[cite: 2]. La aplicación web devuelve un mensaje de error o la información del usuario esperado[cite: 2].
-
-![SOC Analyst - Enumeración ID 1](SOC_Analyst_06_enumeracion_id.png)
-
-### 2.2. Inyección SQL (Boolean-Based)
-A continuación, se prueba a inyectar una sentencia booleana clásica: `' OR '1'='1`[cite: 2]. 
-Como resultado, se obtiene un error favorable para el atacante porque la aplicación concatena todos los fallos sin sanitizar la entrada previamente, volcando la información de todos los usuarios de la base de datos[cite: 2].
-
-![SOC Analyst - Inyección Exitosa](SOC_Analyst_07_inyeccion_exitosa.png)
+![SOC Analyst - DVWA Login](SOC_Analyst_03_login_dvwa.png)
 
 ---
 
-## 3. Análisis de Código (White-box Analysis)
+## 2. Enumeration and Exploitation (Low Security)
 
-Para entender exactamente qué ha sucedido en el backend, se revisa el código fuente PHP del aplicativo web[cite: 2].
+To analyze the vulnerability in its most critical state, navigate to the "DVWA Security" menu and set the security level to the lowest possible setting ("Low").
 
-![SOC Analyst - Código Fuente PHP](SOC_Analyst_08_codigo_php.png)
+![SOC Analyst - Security Menu](SOC_Analyst_04_menu_seguridad.png)
+![SOC Analyst - Low Level](SOC_Analyst_05_nivel_low.png)
 
-La vulnerabilidad se resume en la interacción de tres elementos inyectados por el atacante[cite: 2]:
-1.  **La comilla (`'`):** Engaña al sistema cerrando prematuramente el campo de texto, permitiendo que todo lo que se escriba después sea interpretado como comandos SQL ejecutables y no como simples palabras[cite: 2].
-2.  **La inyección (`UNION SELECT`):** Altera la consulta original obligando a la base de datos a fusionar el resultado esperado con información confidencial extraída de otras tablas (como usuarios y contraseñas)[cite: 2].
-3.  **El parche (`#`):** Convierte el resto del código original del desarrollador en un comentario ignorado, evitando así que queden restos de código suelto que rompan la sintaxis y hagan fallar el ataque[cite: 2].
+### 2.1. Baseline Behavior
+The first step in enumeration consists of checking how the application behaves when valid user IDs (such as 1, 2, 3...) are entered. The web application returns either an error message or the expected user information.
+
+![SOC Analyst - ID 1 Enumeration](SOC_Analyst_06_enumeracion_id.png)
+
+### 2.2. SQL Injection (Boolean-Based)
+Next, a classic boolean statement is injected: `' OR '1'='1`. 
+As a result, an error favorable to the attacker is obtained because the application concatenates all inputs without prior sanitization, dumping the information of all users in the database.
+
+![SOC Analyst - Successful Injection](SOC_Analyst_07_inyeccion_exitosa.png)
 
 ---
 
-## 4. Mitigación y Detección (High Security)
+## 3. Source Code Analysis (White-box)
 
-Finalmente, se procede a probar los mecanismos de defensa cambiando el modo de seguridad a "High" y volviendo a lanzar los pasos anteriores[cite: 2].
+To understand exactly what happened in the backend, the web application's PHP source code is reviewed.
 
-Con la consulta de las tres comillas o `' OR '1'='1`, la aplicación no arroja nada[cite: 2]. Al cambiar el nivel de seguridad a High e intentar una inyección booleana tradicional por GET, la aplicación mitiga el ataque de forma silenciosa, no devolviendo datos ni revelando la estructura de la base de datos mediante errores[cite: 2].
+![SOC Analyst - PHP Source Code](SOC_Analyst_08_codigo_php.png)
 
-![SOC Analyst - Rastro en URL](SOC_Analyst_09_rastro_url.png)
+The vulnerability can be summarized by the interaction of three elements injected by the attacker:
 
-### 4.1. Perspectiva SOC (Detección de artefactos)
-Aunque, según se observa en la barra de direcciones, sí se ha intentado la consulta[cite: 2]. La URL cambia por culpa del navegador web, no porque el servidor haya aceptado el ataque[cite: 2]. Esto significa que aunque el servidor haya bloqueado el ataque y la página no muestre ningún error, esta petición sí deja un rastro[cite: 2]. Este rastro en la URL (`%27`, `%3D`) es un artefacto crítico que un analista SOC puede monitorizar en los registros del servidor web (Access Logs) para detectar intentos activos de explotación en la red.
+1.  **The Single Quote (`'`):** Tricks the system by prematurely closing the text field, allowing everything written afterwards to be interpreted as executable SQL commands rather than simple strings.
+2.  **The Injection (`UNION SELECT`):** Alters the original query, forcing the database to merge the expected result with sensitive information extracted from other tables (such as users and passwords).
+3.  **The Patch (`#`):** Converts the rest of the developer's original code into an ignored comment, thereby preventing any loose code remnants from breaking the syntax and causing the attack to fail.
+
+---
+
+## 4. Mitigation and Detection (High Security)
+
+Finally, the defense mechanisms are tested by changing the security mode to "High" and repeating the previous steps.
+
+With the query of the three quotes or `' OR '1'='1`, the application returns nothing. When changing the security level to High and attempting a traditional boolean injection via GET, the application silently mitigates the attack, returning no data and revealing no database structure through errors.
+
+![SOC Analyst - URL Trace](SOC_Analyst_09_rastro_url.png)
+
+### 4.1. SOC Perspective (Artifact Detection)
+However, as seen in the address bar, the query was indeed attempted. The URL changes due to the web browser, not because the server accepted the attack. This means that even though the server blocked the attack and the page displays no errors, this request does leave a trace. This trace in the URL (`%27`, `%3D`) is a critical artifact that a SOC analyst can monitor in the web server logs (Access Logs) to detect active exploitation attempts on the network.
