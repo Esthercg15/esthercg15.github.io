@@ -4,7 +4,7 @@
 https://github.com/Esthercg15/esthercg15.github.io/blob/1c9461962e3481e588be376cfa9e21c5ca9abd30/SOC_Analyst_Portfolio/SQL_Injection_DVWA/image.png 
 ## SOC Analyst & Penetration Testing Portfolio
 
-![Kali accessing Metasploitable](images/image_23d16a.png) 
+![Kali accessing Metasploitable](./image.png) 
 
 This repository serves as a centralized documentation hub for cybersecurity laboratory exercises. Each directory contains a specific practice detailing the attack lifecycle, root cause analysis, and defensive mitigation strategies.
 images/image_23d16a.png 
