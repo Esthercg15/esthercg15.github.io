@@ -1,6 +1,6 @@
 # Main Repository Index
 
-> **Disclaimer:** All projects and writeups in this repository are conducted in controlled, isolated laboratory environments for educational purposes, defensive research, and incident response training. Unauthorized use of these techniques against infrastructure without explicit, written consent is illegal and strictly prohibited.
+> **Disclaimer:** All projects and writeups in this repository are conducted in controlled, isolated laboratory environments for educational purposes, defensive research, and incident response training. 
 
 ## SOC Analyst & Penetration Testing Portfolio
 
