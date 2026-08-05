@@ -1,7 +1,7 @@
 # Main Repository Index
 
 > **Disclaimer:** All projects and writeups in this repository are conducted in controlled, isolated laboratory environments for educational purposes, defensive research, and incident response training. 
-
+https://github.com/Esthercg15/esthercg15.github.io/blob/1c9461962e3481e588be376cfa9e21c5ca9abd30/SOC_Analyst_Portfolio/SQL_Injection_DVWA/image.png 
 ## SOC Analyst & Penetration Testing Portfolio
 
 ![Kali accessing Metasploitable](images/image_23d16a.png) 
