@@ -50,3 +50,6 @@ A white-box review of the underlying PHP backend identified the exact implementa
 
 ```php
 $getid = "SELECT first_name, last_name FROM users WHERE user_id = '$id'";
+
+
+images/image_23d16a.png
