@@ -3,7 +3,7 @@
 > **Disclaimer:** All projects and writeups in this repository are conducted in controlled, isolated laboratory environments for educational purposes, defensive research, and incident response training. 
 
 ## SOC Analyst & Penetration Testing Portfolio
-
+![Kali accessing Metasploitable](images/image_23d16a.png)
 This repository serves as a centralized documentation hub for cybersecurity laboratory exercises. Each directory contains a specific practice detailing the attack lifecycle, root cause analysis, and defensive mitigation strategies.
 images/image_23d16a.png 
 
