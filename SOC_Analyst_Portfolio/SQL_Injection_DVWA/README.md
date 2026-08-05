@@ -5,6 +5,7 @@
 ## SOC Analyst & Penetration Testing Portfolio
 
 This repository serves as a centralized documentation hub for cybersecurity laboratory exercises. Each directory contains a specific practice detailing the attack lifecycle, root cause analysis, and defensive mitigation strategies.
+images/image_23d16a.png 
 
 ### Index of Practices
 
