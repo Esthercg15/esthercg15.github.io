@@ -1,98 +1,98 @@
-[EN English](README.md)
+[ES Español](README_es.md)
 
-# Writeup: Descifrado César y Fuerza Bruta (Python)
+# Writeup: Caesar Cipher Decryption & Brute Force (Python)
 
-> **Disclaimer:** Todos los proyectos y writeups en este repositorio se realizan en entornos de laboratorio controlados y aislados con fines educativos, de investigación defensiva y entrenamiento en respuesta a incidentes.
+> **Disclaimer:** All projects and writeups in this repository are conducted in controlled, isolated laboratory environments for educational purposes, defensive research, and incident response training. 
 
-## Mapeo MITRE ATT&CK
-*   **Tácticas:** Credential Access, Defense Evasion.
-*   **Técnicas:**
+## MITRE ATT&CK Mapping
+*   **Tactics:** Credential Access, Defense Evasion.
+*   **Techniques:**
     *   [T1140] Deobfuscate/Decode Files or Information
     *   [T1110] Brute Force
 
 ---
 
-## 1. Fundamentos del Ataque
+## 1. Attack Fundamentals
 
-Para el cifrado César, que utiliza un algoritmo de sustitución, la técnica de ataque óptima es la fuerza bruta. Esto permite probar todo el espacio de claves posibles. La secuencia lógica consiste en probar distintos números de sustitución hasta dar con la clave correcta.
+For the Caesar cipher, which uses a substitution algorithm, the optimal attack technique is brute force. This allows testing the entire space of possible keys. The logic involves trying different substitution numbers until the correct key is found. 
 
-Para el alfabeto inglés, se pueden probar hasta 26 claves distintas, donde la clave indica el número de posiciones desplazadas. 
-Ejemplo para el texto cifrado "KROD":
+For the English alphabet, an attacker can try up to 26 different keys, where the key indicates the number of positions shifted. 
+Example for the ciphertext "KROD":
 * clave 1 → JQNC
 * clave 2 → IPMB
-* clave 3 → HOLA (tiene sentido)
+* clave 3 → HOLA (makes sense)
 * clave 4 → GNKZ
 
 ---
 
-## 2. Preparación del Entorno
+## 2. Environment Setup
 
-Se procede a instalar un editor de texto (Emacs) para programar el script en la máquina atacante.
+First, a text editor (Emacs) is installed on the attacking machine to write the script.
 
-![SOC Analyst - Instalar Emacs](SOC_Analyst_01_install_emacs.png)
+![SOC Analyst - Install Emacs](SOC_Analyst_01_install_emacs.png)
 
-A continuación, se abre el script al que se ha llamado `cifrado_cesar_fb.py`.
+Next, the script named `cifrado_cesar_fb.py` is opened.
 
-![SOC Analyst - Crear Script](SOC_Analyst_02_create_script.png)
+![SOC Analyst - Create Script](SOC_Analyst_02_create_script.png)
 
-Este es el fichero donde se va a programar el código.
+This is the file where the code will be written.
 
-![SOC Analyst - Interfaz Emacs](SOC_Analyst_03_emacs_interface.png)
-
----
-
-## 3. Algoritmo de Descifrado Manual
-
-En primer lugar, se definen las líneas base de la función que va a descifrar el texto. La función `algoritmo_descifrado()` recibe un texto cifrado y una clave. Inicializa una cadena vacía (`texto_plano`) y, mediante un bucle `for`, recorre cada carácter para aplicar el desplazamiento inverso correspondiente. El valor de `clave_descifrado` determinará el número de posiciones a retroceder.
-
-![SOC Analyst - Definir Función](SOC_Analyst_04_def_algorithm.png)
-
-Se debe validar que cada letra pertenece al alfabeto inglés, el cual se importará desde la librería `string` de Python.
-
-![SOC Analyst - Módulo String](SOC_Analyst_05_string_module.png)
-
-El script recorre cada carácter: si no pertenece al alfabeto, lo conserva; si es una letra, obtiene su posición, resta la clave y añade la letra resultante a `texto_plano`, devolviendo el mensaje final.
-
-![SOC Analyst - Lógica de Descifrado](SOC_Analyst_06_decryption_logic.png)
-
-El programa pide al usuario el mensaje cifrado y la clave, convirtiendo el texto a minúsculas y la clave a formato numérico.
-
-![SOC Analyst - Entrada de Usuario](SOC_Analyst_07_user_input.png)
-
-Finalmente, se llama a la función `algoritmo_descifrado()`, el resultado se guarda en `texto_plano` y se muestra en pantalla con `print()`.
-
-![SOC Analyst - Ejecución Principal](SOC_Analyst_08_main_execution.png)
-
-Al ejecutar `python3 cifrado_cesar_fb.py` con el texto "krod" y la clave 3, se obtiene el texto perfectamente descifrado: "hola".
-
-![SOC Analyst - Prueba de Script](SOC_Analyst_09_test_script.png)
+![SOC Analyst - Emacs Interface](SOC_Analyst_03_emacs_interface.png)
 
 ---
 
-## 4. Automatización y Fuerza Bruta (2ª Parte)
+## 3. Manual Decryption Algorithm
 
-En esta segunda fase, se programa una función adicional para implementar el ataque de fuerza bruta automáticamente. Para encontrar la clave que devuelva un texto con sentido, se requiere detectar el idioma usando la librería `langdetect`.
+First, the baseline function for decrypting the text is defined. The `algoritmo_descifrado()` function takes a ciphertext and a key. It initializes an empty string (`texto_plano`) and, using a `for` loop, iterates through each character to apply the reverse shift. The `clave_descifrado` value determines the number of positions to step back.
+
+![SOC Analyst - Define Function](SOC_Analyst_04_def_algorithm.png)
+
+It is necessary to validate that each letter belongs to the English alphabet, which is imported from Python's `string` library.
+
+![SOC Analyst - String Module](SOC_Analyst_05_string_module.png)
+
+The script iterates through each character: if it does not belong to the alphabet, it is kept unchanged; if it is a letter, it retrieves its position, subtracts the key, and appends the resulting letter to `texto_plano`, returning the final message.
+
+![SOC Analyst - Decryption Logic](SOC_Analyst_06_decryption_logic.png)
+
+The program asks the user for the ciphertext and the key, converting the text to lowercase and the key to a numerical format.
+
+![SOC Analyst - User Input](SOC_Analyst_07_user_input.png)
+
+Finally, the `algoritmo_descifrado()` function is called, the result is stored in `texto_plano`, and it is displayed on the screen using `print()`.
+
+![SOC Analyst - Main Execution](SOC_Analyst_08_main_execution.png)
+
+Executing `python3 cifrado_cesar_fb.py` with the text "krod" and key 3 returns the perfectly decrypted text: "hola".
+
+![SOC Analyst - Test Script](SOC_Analyst_09_test_script.png)
+
+---
+
+## 4. Automation and Brute Force (Part 2)
+
+In this second phase, an additional function is programmed to automatically implement the brute force attack. To find the key that returns a meaningful text, language detection is required using the `langdetect` library.
 
 ![SOC Analyst - Langdetect](SOC_Analyst_10_langdetect.png)
 
-Se exporta esta librería en el script para importar la función `detect`.
+This library is imported into the script to use the `detect` function.
 
-![SOC Analyst - Importar Langdetect](SOC_Analyst_11_import_langdetect.png)
+![SOC Analyst - Import Langdetect](SOC_Analyst_11_import_langdetect.png)
 
-Se añade la función de fuerza bruta que prueba todas las claves posibles usando `range(len(ALFABETO))`. Para cada clave, se descifra el texto y `langdetect` comprueba si está en español ("es"). Al detectarlo, muestra el mensaje, la clave utilizada y termina la búsqueda con `return`.
+The brute force function is added, which tests all possible keys using `range(len(ALFABETO))`. For each key, the text is decrypted, and `langdetect` checks if it is in Spanish ("es"). Upon detection, it displays the message and the key used, terminating the search with `return`.
 
-![SOC Analyst - Lógica de Fuerza Bruta](SOC_Analyst_12_brute_force_function.png)
+![SOC Analyst - Brute Force Logic](SOC_Analyst_12_brute_force_function.png)
 
-Se actualiza el código para invocar esta nueva función `fuerza_bruta`.
+The code is updated to invoke this new `fuerza_bruta` function.
 
-![SOC Analyst - Main Actualizado](SOC_Analyst_13_main_automation.png)
+![SOC Analyst - Updated Main](SOC_Analyst_13_main_automation.png)
 
-### 4.1. Validación Final
+### 4.1. Final Validation
 
-Para validar la herramienta, se crea un texto cifrado desde `dcode.fr` con una clave de 15. El texto cifrado resultante es "thid th jc itmid epgp sthrxugpg".
+To validate the tool, a ciphertext is generated from `dcode.fr` using a key of 15. The resulting ciphertext is "thid th jc itmid epgp sthrxugpg".
 
-![SOC Analyst - Generación de Payload](SOC_Analyst_14_dcode_test_generation.png)
+![SOC Analyst - Payload Generation](SOC_Analyst_14_dcode_test_generation.png)
 
-Al ejecutar el script contra este texto, el ataque de fuerza bruta funciona correctamente.
+When executing the script against this text, the brute force attack works perfectly.
 
-![SOC Analyst - Éxito de Automatización](SOC_Analyst_15_automated_success.png)
+![SOC Analyst - Successful Automation](SOC_Analyst_15_automated_success.png)
